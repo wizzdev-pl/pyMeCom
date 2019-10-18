@@ -11,8 +11,8 @@ from serial import Serial
 from PyCRC.CRCCCITT import CRCCCITT
 
 # from this package
-from .exceptions import ResponseException, WrongResponseSequence, WrongChecksum, ResponseTimeout, UnknownParameter
-from .commands import PARAMETERS, ERRORS
+from exceptions import ResponseException, WrongResponseSequence, WrongChecksum, ResponseTimeout, UnknownParameter
+from commands import PARAMETERS, ERRORS
 
 
 class Parameter(object):
@@ -648,39 +648,58 @@ class MeCom:
 
 
 if __name__ == "__main__":
-    with MeCom("/dev/ttyUSB0") as mc:
-        # # which device are we talking to?
-        address = mc.identify()
-        status = mc.status()
-        print("connected to device: {}, status: {}".format(address, status))
 
-        # get object temperature
-        temp = mc.get_parameter(parameter_name="Object Temperature", address=address)
-        print("query for object temperature, measured temperature {}C".format(temp))
+    import serial.tools.list_ports
 
-        # is the loop stable?
-        stable_id = mc.get_parameter(parameter_name="Temperature is Stable", address=address)
-        if stable_id == 0:
-            stable = "temperature regulation is not active"
-        elif stable_id == 1:
-            stable = "is not stable"
-        elif stable_id == 2:
-            stable = "is stable"
+    TEC_CONTROLER_VENDOR_IDS = (0x0403,)  ## FTDI chip vendor ID....
+
+
+    def get_tec_serial_port():
+        ports_list = serial.tools.list_ports.comports()
+        ports_to_return = []
+        for comport in ports_list:
+
+            print("")
+            print(f"Trying to connect to: {comport.device}")
+
+            try:
+
+                with MeCom(comport.device) as mc:
+                    # # which device are we talking to?
+                    address = mc.identify()
+                    status = mc.status()
+                    print("connected to device: {}, status: {}".format(address, status))
+
+                    # get serial id
+                    serial_id = mc.get_parameter(parameter_id=102, address=address)
+                    print(f"Serial No.: {serial_id}")
+
+                    # get object temperature
+                    temp = mc.get_parameter(parameter_name="Object Temperature", address=address)
+                    print("query for object temperature, measured temperature {}C".format(temp))
+
+                    # is the loop stable?
+                    stable_id = mc.get_parameter(parameter_name="Temperature is Stable", address=address)
+                    if stable_id == 0:
+                        stable = "temperature regulation is not active"
+                    elif stable_id == 1:
+                        stable = "is not stable"
+                    elif stable_id == 2:
+                        stable = "is stable"
+                    else:
+                        stable = "state is unknown"
+                    print("query for loop stability, loop {}".format(stable))
+
+                    print("leaving with-statement, connection will be closed")
+
+            except Exception as ex:
+                print(f"Exception: {str(ex)} while trying to open port {comport.device}")
+
+
+        if len(ports_to_return) == 0:
+            return None
         else:
-            stable = "state is unknown"
-        print("query for loop stability, loop {}".format(stable))
+            return ports_to_return
 
-        # # setting a new device address and get again
-        # new_address = 6
-        # value_set = mc.set_parameter(value=new_address, parameter_name="Device Address")
-        # print("setting device address to {}".format(value_set))
-        #
-        # # get device address again
-        # address = mc.identify()
-        # print("connected to device: {}".format(address))
 
-        # set target temperature to 21C
-        # success = mc.set_parameter(value=20.0, parameter_id=3000)
-        # print(success)
-
-        print("leaving with-statement, connection will be closed")
+    ports = get_tec_serial_port()

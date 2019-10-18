@@ -5,7 +5,12 @@ https://www.meerstetter.ch/category/35-latest-communication-protocols
 
 
 PARAMETERS = [
+    {"id": 100, "name": "Device Type", "format": "INT32"},
+    {"id": 101, "name": "Hardware Version", "format": "INT32"},
+    {"id": 102, "name": "Serial Number", "format": "INT32"},
+    {"id": 103, "name": "Firmware Version", "format": "INT32"},
     {"id": 104, "name": "Device Status", "format": "INT32"},
+    {"id": 105, "name": "Error Number", "format": "INT32"},
     {"id": 108, "name": "Save Data to Flash", "format": "INT32"},
     {"id": 109, "name": "Flash Status", "format": "INT32"},
     {"id": 1000, "name": "Object Temperature", "format": "FLOAT32"},
@@ -18,6 +23,9 @@ PARAMETERS = [
     {"id": 2010, "name": "Status", "format": "INT32"},
     {"id": 2051, "name": "Device Address", "format": "INT32"},
     {"id": 3000, "name": "Target Object Temp (Set)", "format": "FLOAT32"},
+    {"id": 3003, "name": "Coarse Temp Ramp (Set)", "format": "FLOAT32"},
+    {"id": 3002, "name": "Proximity Width (Set)", "format": "FLOAT32"},
+    {"id": 3020, "name": "Mode (Set)", "format": "INT32"},
     {"id": 6310, "name": "Delay till Restart", "format": "FLOAT32"},
 ]
 
