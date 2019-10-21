@@ -11,8 +11,8 @@ from serial import Serial
 from PyCRC.CRCCCITT import CRCCCITT
 
 # from this package
-from exceptions import ResponseException, WrongResponseSequence, WrongChecksum, ResponseTimeout, UnknownParameter
-from commands import PARAMETERS, ERRORS
+from .exceptions import ResponseException, WrongResponseSequence, WrongChecksum, ResponseTimeout, UnknownParameter
+from .commands import PARAMETERS, ERRORS
 
 
 class Parameter(object):
@@ -674,9 +674,14 @@ if __name__ == "__main__":
                     serial_id = mc.get_parameter(parameter_id=102, address=address)
                     print(f"Serial No.: {serial_id}")
 
+
+                    device_type = mc.get_parameter(parameter_id=100, address=address)
+                    print(f"Device type TEC {device_type}")
+
                     # get object temperature
                     temp = mc.get_parameter(parameter_name="Object Temperature", address=address)
                     print("query for object temperature, measured temperature {}C".format(temp))
+
 
                     # is the loop stable?
                     stable_id = mc.get_parameter(parameter_name="Temperature is Stable", address=address)
